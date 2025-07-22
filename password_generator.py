@@ -1,12 +1,8 @@
+"""password_generator.py – v1.5  (Interactive loop)
 
-"""password_generator.py – v1.3
-
-Fixed: *getpass* blocks/hides prompt in some IDEs (e.g. PyCharm Run tool).
-If *getpass* fails we now fall back to visible `input()`.
-
-Tip – outside an IDE, you still get hidden input.
-
-Dependencies:  `pip install cryptography`
+* Generate unlimited passwords in one run until you choose to quit.
+* Each cycle: generate → (optional) encrypt → (optional) save.
+* At the end of each cycle you can decide to repeat or exit.
 """
 from __future__ import annotations
 
@@ -17,11 +13,12 @@ import warnings
 from typing import List
 
 try:
-    from getpass import GetPassWarning, getpass
-except ImportError:  # WebAssembly or stripped Python build
+    from getpass import getpass, GetPassWarning
+except ImportError:
     getpass = None  # type: ignore[assignment]
 
 from password_crypto import decrypt_password, encrypt_password
+from password_store import add_entry, STORE_PATH
 
 CHAR_POOLS = {
     "letters": string.ascii_letters,
@@ -35,75 +32,91 @@ CHAR_POOLS = {
 # ──────────────────────────────────────────────────────────────────────────────
 
 def _confirm(prompt: str) -> bool:
-    """Return *True* if the user's response begins with "y" or "Y"."""
     return input(prompt).strip().lower().startswith("y")
 
 
-def _ask_passphrase(prompt: str = "Passphrase: ") -> str:
-    """Return a passphrase, falling back to *input()* if getpass is unsupported."""
-    if getpass is None:  # getpass could not be imported
-        return input(prompt + "(visible) ")
-
+def _ask_passphrase(prompt: str = "Passphrase") -> str:
+    if getpass is None:
+        return input(prompt + " (visible): ")
     try:
         with warnings.catch_warnings():
             warnings.simplefilter("ignore", category=GetPassWarning)
-            return getpass(prompt)
-    except (EOFError, KeyboardInterrupt):
-        # User aborted with Ctrl‑D/Ctrl‑C
-        sys.exit("\n[Aborted]")
-    except Exception:  # pragma: no cover – catch‑all for rare console issues
-        # getpass failed (common in some IDE consoles). Fallback gracefully.
-        return input(prompt + "(visible) ")
+            return getpass(prompt + ": ")
+    except Exception:
+        return input(prompt + " (visible): ")
 
 
 def generate_password(length: int) -> str:
-    """Generate a random password containing at least one char from every pool."""
     pool_count = len(CHAR_POOLS)
     if length < pool_count:
-        raise ValueError(
-            f"Length must be at least {pool_count} (one for each pool: {', '.join(CHAR_POOLS)})"
-        )
+        raise ValueError(f"Length must be ≥{pool_count} (one per pool)")
 
-    password_chars: List[str] = [secrets.choice(pool) for pool in CHAR_POOLS.values()]
+    chars: List[str] = [secrets.choice(p) for p in CHAR_POOLS.values()]
     all_chars = "".join(CHAR_POOLS.values())
-    password_chars.extend(secrets.choice(all_chars) for _ in range(length - pool_count))
-    secrets.SystemRandom().shuffle(password_chars)
-    return "".join(password_chars)
+    chars.extend(secrets.choice(all_chars) for _ in range(length - pool_count))
+    secrets.SystemRandom().shuffle(chars)
+    return "".join(chars)
 
 
 # ──────────────────────────────────────────────────────────────────────────────
-# CLI entry point
+# Main interactive loop
 # ──────────────────────────────────────────────────────────────────────────────
 
-def main() -> None:  # noqa: D401 – imperative mood required by CLI
-    print("Welcome to the Password Generator!\n")
-    try:
-        length = int(input("Desired length (≥3): "))
-        plain_pw = generate_password(length)
-    except ValueError as exc:
-        print(f"[Error] {exc}")
-        return
+def main() -> None:  # noqa: D401
+    print("★ Secure Password Generator ★\n")
 
-    print("\nGenerated password:", plain_pw)
-
-    # Optional encryption
-    if _confirm("\nEncrypt it now? [y/N]: "):
-        passphrase = _ask_passphrase("Passphrase (hidden if supported): ")
-        if not passphrase:
-            print("[Info] Encryption skipped – passphrase was empty.")
+    while True:
+        # ─── length prompt ────────────────────────────────────────────────────
+        try:
+            length = int(input("Desired length (≥3, 0 to quit): "))
+        except ValueError:
+            print("[Error] Please enter an integer.")
+            continue
+        if length == 0:
+            print("Good‑bye!")
             return
 
-        encrypted = encrypt_password(plain_pw, passphrase)
-        print("\nEncrypted password (store this string):\n", encrypted)
+        # ─── generate ─────────────────────────────────────────────────────────
+        try:
+            password = generate_password(length)
+        except ValueError as exc:
+            print("[Error]", exc)
+            continue
 
-        if _confirm("\nDecrypt to verify? [y/N]: "):
-            try:
-                decrypted = decrypt_password(encrypted, passphrase)
-                print("\nDecrypted password:", decrypted)
-            except Exception as exc:  # pylint: disable=broad-except
-                print("[Error] Decryption failed.", exc)
-    else:
-        print("[Info] Encryption step skipped.")
+        print("\nGenerated password:", password)
+
+        # ─── encryption ──────────────────────────────────────────────────────
+        token = None
+        if _confirm("Encrypt it? [y/N]: "):
+            passphrase = _ask_passphrase()
+            if not passphrase:
+                print("[Info] Empty pass‑phrase – skipped encryption.")
+            else:
+                token = encrypt_password(password, passphrase)
+                print("\nEncrypted token:\n", token)
+
+                if _confirm("Decrypt to verify? [y/N]: "):
+                    try:
+                        plain = decrypt_password(token, passphrase)
+                        print("\nDecrypted password:", plain)
+                    except Exception as exc:  # pylint: disable=broad-except
+                        print("[Error] Decryption failed:", exc)
+                        token = None  # avoid saving corrupt token
+
+        # ─── save ────────────────────────────────────────────────────────────
+        if token and _confirm("Save encrypted token to vault? [y/N]: "):
+            label = input("Label (e.g., gmail): ").strip()
+            if label:
+                add_entry(label, token)
+                print(f"[Saved] → {label} ({STORE_PATH})")
+            else:
+                print("[Info] Empty label – not saved.")
+
+        # ─── repeat? ──────────────────────────────────────────────────────────
+        if not _confirm("\nGenerate another password? [y/N]: "):
+            print("Good‑bye!")
+            return
+        print()
 
 
 if __name__ == "__main__":
