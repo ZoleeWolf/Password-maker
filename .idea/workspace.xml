@@ -4,13 +4,11 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c2673684-4fbc-42f7-97e8-6df1b7582b4f" name="Changes" comment="Generator and Crypto created">
-      <change afterPath="$PROJECT_DIR$/password_lookup.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/password_manager_gui.py" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/password_store.py" afterDir="false" />
+    <list default="true" id="c2673684-4fbc-42f7-97e8-6df1b7582b4f" name="Changes" comment="Basic script is done, with helps.">
+      <change afterPath="$PROJECT_DIR$/drive_sync.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/test.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/password_crypto.py" beforeDir="false" afterPath="$PROJECT_DIR$/password_crypto.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/password_generator.py" beforeDir="false" afterPath="$PROJECT_DIR$/password_generator.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/password_store.py" beforeDir="false" afterPath="$PROJECT_DIR$/password_store.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -27,21 +25,21 @@
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="GitHubPullRequestSearchHistory"><![CDATA[{
-  "lastFilter": {
-    "state": "OPEN",
-    "assignee": "ZoleeWolf"
+  <component name="GitHubPullRequestSearchHistory">{
+  &quot;lastFilter&quot;: {
+    &quot;state&quot;: &quot;OPEN&quot;,
+    &quot;assignee&quot;: &quot;ZoleeWolf&quot;
   }
-}]]></component>
-  <component name="GithubPullRequestsUISettings"><![CDATA[{
-  "selectedUrlAndAccountId": {
-    "url": "https://github.com/ZoleeWolf/Password-maker.git",
-    "accountId": "6406f6de-3af9-408c-b847-3bbd0cf7fd59"
+}</component>
+  <component name="GithubPullRequestsUISettings">{
+  &quot;selectedUrlAndAccountId&quot;: {
+    &quot;url&quot;: &quot;https://github.com/ZoleeWolf/Password-maker.git&quot;,
+    &quot;accountId&quot;: &quot;6406f6de-3af9-408c-b847-3bbd0cf7fd59&quot;
   }
-}]]></component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 2
-}]]></component>
+}</component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 2
+}</component>
   <component name="ProjectId" id="30E1xhIdVKsVCl9UpKTo30xVjMj" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -51,10 +49,12 @@
   "keyToString": {
     "ModuleVcsDetector.initialDetectionPerformed": "true",
     "Python.Generator.executor": "Run",
+    "Python.drive_sync.executor": "Run",
     "Python.password_crypto.executor": "Run",
     "Python.password_generator.executor": "Run",
     "Python.password_manager_gui.executor": "Run",
     "Python.password_store.executor": "Run",
+    "Python.test.executor": "Run",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.git.unshallow": "true",
     "git-widget-placeholder": "master",
@@ -84,7 +84,15 @@
       <option name="project" value="LOCAL" />
       <updated>1753180463225</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Basic script is done, with helps.">
+      <option name="closed" value="true" />
+      <created>1753186920499</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1753186920499</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
@@ -122,6 +130,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Generator and Crypto created" />
-    <option name="LAST_COMMIT_MESSAGE" value="Generator and Crypto created" />
+    <MESSAGE value="Basic script is done, with helps." />
+    <option name="LAST_COMMIT_MESSAGE" value="Basic script is done, with helps." />
   </component>
 </project>
